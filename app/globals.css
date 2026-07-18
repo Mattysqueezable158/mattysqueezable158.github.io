@@ -434,3 +434,144 @@ select.input-field option {
 .text-center {
   text-align: center;
 }
+
+/* ─── PWA safe-area (notch / home indicator) ─────────────────────────────── */
+.container {
+  padding-bottom: max(24px, env(safe-area-inset-bottom));
+  padding-left: max(24px, env(safe-area-inset-left));
+  padding-right: max(24px, env(safe-area-inset-right));
+}
+
+/* ─── Pull-to-Refresh indicator ─────────────────────────────────────────── */
+.ptr-indicator {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  height: 60px;
+  background: linear-gradient(180deg, rgba(0,242,254,0.15) 0%, transparent 100%);
+  color: var(--accent-blue);
+  font-size: 0.85rem;
+  font-weight: 600;
+  transform: translateY(-100%);
+  transition: transform 0.25s ease;
+  pointer-events: none;
+}
+
+.ptr-indicator.ptr-visible {
+  transform: translateY(0);
+}
+
+.ptr-spinner {
+  width: 20px;
+  height: 20px;
+  border: 2px solid rgba(0,242,254,0.3);
+  border-top-color: var(--accent-blue);
+  border-radius: 50%;
+  animation: rotate-cw 0.8s linear infinite;
+}
+
+/* ─── Mobile Responsive ──────────────────────────────────────────────────── */
+@media (max-width: 640px) {
+  /* Typography scale-down */
+  h1 { font-size: 1.8rem; }
+  h2 { font-size: 1.2rem; }
+  p  { font-size: 0.88rem; }
+
+  .neon-text { font-size: 1.3rem !important; }
+
+  /* Container full-width on mobile */
+  .container {
+    padding: 16px;
+    padding-bottom: max(16px, env(safe-area-inset-bottom));
+  }
+
+  /* Glass cards less padding */
+  .glass-card {
+    padding: 16px !important;
+    border-radius: 16px;
+  }
+
+  /* Door button smaller on mobile */
+  .door-button-container {
+    width: 180px;
+    height: 180px;
+    margin: 28px auto;
+  }
+
+  .door-btn {
+    width: 148px;
+    height: 148px;
+    font-size: 1rem;
+  }
+
+  .door-btn svg {
+    width: 34px !important;
+    height: 34px !important;
+  }
+
+  /* 2-col grids → 1-col */
+  div[style*="gridTemplateColumns: '1fr 1fr'"],
+  div[style*="grid-template-columns: 1fr 1fr"] {
+    display: flex !important;
+    flex-direction: column !important;
+  }
+
+  /* 3-col grids → 1-col */
+  div[style*="gridTemplateColumns: '2fr 1fr 1fr'"] {
+    display: flex !important;
+    flex-direction: column !important;
+  }
+
+  /* Admin tab buttons: 2 per row */
+  .admin-tabs {
+    display: grid !important;
+    grid-template-columns: 1fr 1fr !important;
+  }
+
+  /* Header: stack on mobile */
+  .admin-header {
+    flex-direction: column !important;
+    gap: 12px;
+    align-items: flex-start !important;
+  }
+
+  /* Log table: compact */
+  .logs-table th,
+  .logs-table td {
+    padding: 10px 10px;
+    font-size: 0.8rem;
+  }
+
+  /* Buttons: taller touch targets */
+  .btn-primary  { padding: 16px; font-size: 0.95rem; }
+  .btn-secondary { padding: 10px 14px; }
+
+  /* Input fields: larger touch area */
+  .input-field {
+    padding: 14px 14px;
+    font-size: 0.95rem;
+  }
+
+  /* Alert boxes */
+  .alert-box {
+    font-size: 0.82rem;
+    padding: 10px 12px;
+  }
+
+  /* Space utilities */
+  .space-y-6 > * + * { margin-top: 16px; }
+  .space-y-4 > * + * { margin-top: 12px; }
+}
+
+/* ─── Very small screens (≤380px) ───────────────────────────────────────── */
+@media (max-width: 380px) {
+  h1 { font-size: 1.5rem; }
+  .door-button-container { width: 160px; height: 160px; margin: 20px auto; }
+  .door-btn { width: 130px; height: 130px; font-size: 0.9rem; }
+}
