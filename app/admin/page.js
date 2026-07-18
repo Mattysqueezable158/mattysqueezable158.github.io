@@ -21,6 +21,9 @@ export default function AdminDashboard() {
       if (!res.success) {
         router.push('/login' + (res.error === 'another_device' ? '?reason=another_device' : ''))
         router.refresh()
+      } else if (res.profile?.role !== 'admin') {
+        router.push('/')
+        router.refresh()
       }
     }
     checkSession()

@@ -27,8 +27,8 @@ export default function Home() {
     const result = await getCurrentUser(deviceId)
     if (result.success) {
       setProfile(result.profile)
-    } else if (result.error === 'another_device') {
-      router.push('/login?reason=another_device')
+    } else {
+      router.push('/login' + (result.error === 'another_device' ? '?reason=another_device' : ''))
       router.refresh()
     }
   }, [router])

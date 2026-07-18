@@ -3,8 +3,60 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev",
-    "build": "next build",
+    "dSkip to content
+haciveyiszade
+haciveyiszade.github.io
+Repository navigation
+Code
+Issues
+Pull requests
+Actions
+Projects
+Wiki
+Security and quality
+Insights
+Settings
+Deploy Next.js site to Pages
+Create nextjs.yml #1
+All jobs
+Run details
+Annotations
+1 error and 1 warning
+build
+failed now in 31s
+Search logs
+5s
+1s
+0s
+5s
+0s
+1s
+10s
+5s
+Run npx --no-install next build
+⚠ No build cache found. Please configure build caching for faster rebuilds. Read more: https: //nextjs.org/docs/messages/no-cache
+Attention: Next.js now collects completely anonymous telemetry regarding usage.
+This information is used to shape Next.js' roadmap and prioritize features.
+You can learn more, including how to opt-out if you'd not like to participate in this anonymous program, by visiting the following URL:
+https: //nextjs.org/telemetry
+
+▲ Next.js 16.2.10 (Turbopack)
+
+  Creating an optimized production build ...
+✓ Compiled successfully in 3.3s
+  Running TypeScript ...
+  Finished TypeScript in 83ms ...
+  Collecting page data using 3 workers ...
+
+> Server Actions are not supported with static export.
+Read more: https: //nextjs.org/docs/app/building-your-application/deploying/static-exports#unsupported-features
+Error: Process completed with exit code 1.
+0s
+0s
+0s
+0s
+0s
+ev": "next dev","build": "next build",
     "start": "next start",
     "lint": "eslint"
   },
