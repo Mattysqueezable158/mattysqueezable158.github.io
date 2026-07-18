@@ -13,6 +13,10 @@ Bu proje, bir **ESP32-S3** mikrokontrolcü geliştirme kartı ve **Supabase** bu
 
 ---
 
+furkan
+
+
+
 ## 1. Adım: Supabase Veritabanı Kurulumu
 
 Supabase yönetim panelinizde **SQL Editor** bölümüne giderek aşağıdaki SQL betiğini çalıştırın. Bu betik gerekli tabloyu oluşturacak ve RLS güvenlik kurallarını tanımlayacaktır:
