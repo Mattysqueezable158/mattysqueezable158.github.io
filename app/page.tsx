@@ -4,6 +4,7 @@ import { useState, useEffect, useCallback } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import PullToRefresh from '@/components/PullToRefresh'
+import InstallPWA from '@/components/InstallPWA'
 import {
   triggerDoorOpen, checkRequestStatus, getDoorLogs,
   getCurrentUser, signOutAction,
@@ -158,7 +159,8 @@ export default function Home() {
                 : 'Yükleniyor...'}
             </p>
           </div>
-          <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap', justifyContent: 'flex-end' }}>
+          <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap', justifyContent: 'flex-end', alignItems: 'center' }}>
+            <InstallPWA />
             {profile?.role === 'admin' && (
               <Link href="/admin" className="btn-secondary" style={{
                 textDecoration: 'none', background: 'rgba(0,242,254,0.08)',

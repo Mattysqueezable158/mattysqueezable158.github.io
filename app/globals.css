@@ -569,6 +569,61 @@ select.input-field option {
   .space-y-4 > * + * { margin-top: 12px; }
 }
 
+/* ─── Admin panel responsive layout ─────────────────────────────────────── */
+.form-grid-2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+@media (max-width: 768px) {
+  .admin-body {
+    flex-direction: column !important;
+    padding: 12px 12px 20px 12px !important;
+    gap: 12px !important;
+  }
+
+  /* Sidebar → yatay kaydırılabilir sekme çubuğu */
+  .admin-sidebar {
+    position: static !important;
+    width: 100% !important;
+    flex-direction: row !important;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    padding-bottom: 4px;
+  }
+  .admin-sidebar::-webkit-scrollbar { display: none; }
+
+  .admin-tab-btn {
+    width: auto !important;
+    flex: 0 0 auto;
+    padding: 10px 14px !important;
+    border-radius: 12px !important;
+    transform: none !important;
+  }
+  .admin-tab-btn > div:first-child {
+    width: 28px !important;
+    height: 28px !important;
+    font-size: 0.95rem !important;
+  }
+  .admin-tab-sub,
+  .admin-tab-active-bar,
+  .admin-sidebar-footer {
+    display: none !important;
+  }
+
+  .form-grid-2 { grid-template-columns: 1fr; }
+
+  .admin-header {
+    margin: 12px 12px 0 12px !important;
+    padding: 14px 16px !important;
+  }
+
+  /* Geofence haritası mobilde daha kısa */
+  .geofence-map-canvas { height: 300px !important; }
+}
+
 /* ─── Very small screens (≤380px) ───────────────────────────────────────── */
 @media (max-width: 380px) {
   h1 { font-size: 1.5rem; }

@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect, useCallback, useRef } from 'react'
+import dynamic from 'next/dynamic'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import {
@@ -10,6 +11,22 @@ import {
   getCurrentUser,
   type MappedUser, type Flat, type GeofenceSettings,
 } from '../actions'
+
+// Leaflet SSR'da çalışmaz → sadece client-side yükle
+const GeofenceMap = dynamic(() => import('@/components/GeofenceMap'), {
+  ssr: false,
+  loading: () => (
+    <div style={{
+      height: '340px', borderRadius: '14px',
+      background: 'rgba(10,10,15,0.6)',
+      border: '1px solid rgba(0,242,254,0.15)',
+      display: 'flex', alignItems: 'center', justifyContent: 'center',
+      color: 'var(--text-secondary)', fontSize: '0.9rem',
+    }}>
+      🗺️ Harita yükleniyor...
+    </div>
+  ),
+})
 
 // ─── Yardımcı: Haversine mesafe (metre) ──────────────────────────────────────
 function haversineDistance(lat1: number, lng1: number, lat2: number, lng2: number): number {
@@ -75,7 +92,7 @@ function AddUserTab({ onSuccess }: { onSuccess: () => void }) {
       <h2 style={{ marginBottom: '20px' }}>Yeni Kullanıcı Ekle</h2>
       <Alert message={message} />
       <form onSubmit={handleSubmit} className="space-y-4">
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
+        <div className="form-grid-2">
           <div className="input-group">
             <label htmlFor="add-username">KULLANICI ADI</label>
             <input id="add-username" type="text" value={username}
@@ -151,7 +168,7 @@ function AddFlatTab({ onSuccess }: { onSuccess: () => void }) {
         <h2 style={{ marginBottom: '20px' }}>Yeni Daire Ekle</h2>
         <Alert message={message} />
         <form onSubmit={handleSubmit} className="space-y-4">
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
+          <div className="form-grid-2">
             <div className="input-group">
               <label htmlFor="flat-block">BLOK</label>
               <input id="flat-block" type="text" value={block}
@@ -406,27 +423,39 @@ function GeofenceTab() {
             </div>
           </div>
 
-          {/* Koordinatlar */}
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
-            <div className="input-group">
-              <label htmlFor="geo-lat">ENLEM (Latitude)</label>
-              <input id="geo-lat" type="number" step="0.000001" value={settings.lat}
-                onChange={(e) => setSettings((p) => ({ ...p, lat: parseFloat(e.target.value) || 0 }))}
-                className="input-field" placeholder="örn: 41.015137" />
-            </div>
-            <div className="input-group">
-              <label htmlFor="geo-lng">BOYLAM (Longitude)</label>
-              <input id="geo-lng" type="number" step="0.000001" value={settings.lng}
-                onChange={(e) => setSettings((p) => ({ ...p, lng: parseFloat(e.target.value) || 0 }))}
-                className="input-field" placeholder="örn: 28.979530" />
-            </div>
+          {/* ─── Leaflet Harita ─── */}
+          <div className="input-group">
+            <label>HARİTA ÜZERİNDEN ALAN BELİRLE</label>
+            <GeofenceMap
+              lat={settings.lat || 41.015137}
+              lng={settings.lng || 28.979530}
+              radius={settings.radius_meters}
+              onCenterChange={(lat, lng) => setSettings((p) => ({ ...p, lat, lng }))}
+              onRadiusChange={(r) => setSettings((p) => ({ ...p, radius_meters: r }))}
+            />
           </div>
 
-          <div className="input-group">
-            <label htmlFor="geo-radius">YARICAP (Metre) — Merkez noktadan bu mesafe içinde erişim açık</label>
-            <input id="geo-radius" type="number" min="10" max="5000" value={settings.radius_meters}
-              onChange={(e) => setSettings((p) => ({ ...p, radius_meters: parseInt(e.target.value) || 100 }))}
-              className="input-field" placeholder="örn: 100" />
+          {/* Koordinat özeti (salt okunur) */}
+          <div style={{
+            display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(96px, 1fr))', gap: '10px',
+            padding: '12px 16px',
+            background: 'rgba(0,242,254,0.04)',
+            border: '1px solid rgba(0,242,254,0.12)',
+            borderRadius: '10px',
+            fontSize: '0.82rem',
+          }}>
+            <div>
+              <div style={{ color: 'var(--text-secondary)', marginBottom: '2px' }}>ENLEM</div>
+              <div style={{ fontWeight: 600, color: '#00f2fe' }}>{settings.lat ? settings.lat.toFixed(6) : '—'}</div>
+            </div>
+            <div>
+              <div style={{ color: 'var(--text-secondary)', marginBottom: '2px' }}>BOYLAM</div>
+              <div style={{ fontWeight: 600, color: '#00f2fe' }}>{settings.lng ? settings.lng.toFixed(6) : '—'}</div>
+            </div>
+            <div>
+              <div style={{ color: 'var(--text-secondary)', marginBottom: '2px' }}>YARICAP</div>
+              <div style={{ fontWeight: 600, color: '#00f2fe' }}>{settings.radius_meters} m</div>
+            </div>
           </div>
 
           {/* Mevcut Konumu Al */}
@@ -601,47 +630,166 @@ export default function AdminDashboard() {
   }
 
   const tabs = [
-    { id: 'users',    label: '👤 Kullanıcı Ekle' },
-    { id: 'flats',    label: '🏠 Daire Ekle' },
-    { id: 'link',     label: '🔗 Eşleştir' },
-    { id: 'geofence', label: '📍 Konum Kısıtı' },
-    { id: 'list',     label: '📋 Hesaplar' },
+    { id: 'users',    emoji: '👤', label: 'Kullanıcı Ekle', sub: 'Yeni hesap oluştur' },
+    { id: 'flats',    emoji: '🏠', label: 'Daire Ekle',     sub: 'Bina & daire tanımla' },
+    { id: 'link',     emoji: '🔗', label: 'Eşleştir',       sub: 'Kullanıcı ↔ Daire' },
+    { id: 'geofence', emoji: '📍', label: 'Konum Kısıtı',   sub: 'GPS alan belirle' },
+    { id: 'list',     emoji: '📋', label: 'Hesaplar',        sub: 'Tüm kullanıcılar' },
   ]
 
   return (
-    <div className="container space-y-6" style={{ padding: '40px 20px', minHeight: '100vh', maxWidth: '900px' }}>
+    <div style={{
+      minHeight: '100vh',
+      display: 'flex',
+      flexDirection: 'column',
+      padding: '0',
+      maxWidth: '1200px',
+      margin: '0 auto',
+      width: '100%',
+    }}>
 
-      {/* Header */}
-      <div className="glass-card" style={{ padding: '20px 24px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+      {/* ── Top Header ── */}
+      <div className="glass-card admin-header" style={{
+        margin: '20px 20px 0 20px',
+        padding: '16px 24px',
+        display: 'flex',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        borderRadius: '20px',
+        flexShrink: 0,
+      }}>
         <div>
-          <h2 className="neon-text" style={{ fontSize: '1.4rem' }}>Hacıveyiszade</h2>
-          <p style={{ fontSize: '0.75rem', letterSpacing: '0.05em', color: 'var(--accent-blue)', fontWeight: 600 }}>YÖNETİM PANELİ</p>
+          <h2 className="neon-text" style={{ fontSize: '1.3rem', marginBottom: '2px' }}>Hacıveyiszade</h2>
+          <p style={{ fontSize: '0.72rem', letterSpacing: '0.08em', color: 'var(--accent-blue)', fontWeight: 700, margin: 0 }}>
+            YÖNETİM PANELİ
+          </p>
         </div>
-        <Link href="/" className="btn-secondary" style={{ textDecoration: 'none' }}>
-          Kontrol Paneli →
+        <Link href="/" className="btn-secondary" style={{ textDecoration: 'none', fontSize: '0.82rem' }}>
+          ← Kontrol Paneli
         </Link>
       </div>
 
-      {/* Tab Navigasyon */}
-      <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
-        {tabs.map((tab) => (
-          <button
-            key={tab.id}
-            onClick={() => setActiveTab(tab.id)}
-            className={activeTab === tab.id ? 'btn-primary' : 'btn-secondary'}
-            style={{ flex: '1 1 auto', minWidth: '130px', padding: '10px 14px', fontSize: '0.82rem' }}
-          >
-            {tab.label}
-          </button>
-        ))}
-      </div>
+      {/* ── Body: Sidebar + Content ── */}
+      <div className="admin-body" style={{
+        display: 'flex',
+        flex: 1,
+        gap: '16px',
+        padding: '16px 20px 24px 20px',
+        alignItems: 'flex-start',
+      }}>
 
-      {/* Tab İçeriği */}
-      {activeTab === 'users'    && <AddUserTab onSuccess={fetchAll} />}
-      {activeTab === 'flats'    && <AddFlatTab onSuccess={fetchAll} />}
-      {activeTab === 'link'     && <LinkTab users={users} flats={flats} onSuccess={fetchAll} />}
-      {activeTab === 'geofence' && <GeofenceTab />}
-      {activeTab === 'list'     && <UsersListTab users={users} loading={loading} onDelete={handleDeleteUser} />}
+        {/* ── Sol Sidebar ── */}
+        <aside style={{
+          width: '210px',
+          flexShrink: 0,
+          display: 'flex',
+          flexDirection: 'column',
+          gap: '8px',
+          position: 'sticky',
+          top: '20px',
+        }}
+          className="admin-sidebar"
+        >
+          {tabs.map((tab) => {
+            const isActive = activeTab === tab.id
+            return (
+              <button
+                key={tab.id}
+                onClick={() => setActiveTab(tab.id)}
+                className="admin-tab-btn"
+                style={{
+                  width: '100%',
+                  padding: '14px 16px',
+                  borderRadius: '16px',
+                  border: isActive
+                    ? '1px solid rgba(0,242,254,0.4)'
+                    : '1px solid rgba(255,255,255,0.06)',
+                  background: isActive
+                    ? 'linear-gradient(135deg, rgba(0,242,254,0.12) 0%, rgba(79,172,254,0.08) 100%)'
+                    : 'rgba(18,18,29,0.5)',
+                  backdropFilter: 'blur(12px)',
+                  cursor: 'pointer',
+                  textAlign: 'left',
+                  transition: 'all 0.25s cubic-bezier(0.16,1,0.3,1)',
+                  boxShadow: isActive
+                    ? '0 4px 20px rgba(0,242,254,0.1), inset 0 1px 0 rgba(0,242,254,0.1)'
+                    : 'none',
+                  transform: isActive ? 'translateX(2px)' : 'none',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '12px',
+                }}
+              >
+                {/* Emoji badge */}
+                <div style={{
+                  width: '36px', height: '36px',
+                  borderRadius: '10px',
+                  background: isActive
+                    ? 'rgba(0,242,254,0.15)'
+                    : 'rgba(255,255,255,0.05)',
+                  display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  fontSize: '1.1rem',
+                  flexShrink: 0,
+                  transition: 'background 0.25s',
+                }}>
+                  {tab.emoji}
+                </div>
+                <div style={{ overflow: 'hidden' }}>
+                  <div style={{
+                    fontSize: '0.88rem',
+                    fontWeight: 600,
+                    color: isActive ? '#00f2fe' : '#e2e8f0',
+                    whiteSpace: 'nowrap',
+                    marginBottom: '1px',
+                  }}>
+                    {tab.label}
+                  </div>
+                  <div className="admin-tab-sub" style={{
+                    fontSize: '0.7rem',
+                    color: isActive ? 'rgba(0,242,254,0.7)' : 'var(--text-secondary)',
+                    whiteSpace: 'nowrap',
+                  }}>
+                    {tab.sub}
+                  </div>
+                </div>
+                {/* Aktif göstergesi */}
+                {isActive && (
+                  <div className="admin-tab-active-bar" style={{
+                    marginLeft: 'auto',
+                    width: '3px', height: '20px',
+                    borderRadius: '2px',
+                    background: 'linear-gradient(180deg, #00f2fe 0%, #4facfe 100%)',
+                    flexShrink: 0,
+                  }} />
+                )}
+              </button>
+            )
+          })}
+
+          {/* Sidebar alt bilgi */}
+          <div className="admin-sidebar-footer" style={{
+            marginTop: '8px',
+            padding: '12px 14px',
+            borderRadius: '12px',
+            background: 'rgba(255,255,255,0.02)',
+            border: '1px solid rgba(255,255,255,0.04)',
+            fontSize: '0.7rem',
+            color: 'rgba(255,255,255,0.2)',
+            lineHeight: 1.6,
+          }}>
+            {users.length} kullanıcı · {flats.length} daire
+          </div>
+        </aside>
+
+        {/* ── İçerik Alanı ── */}
+        <main style={{ flex: 1, minWidth: 0 }}>
+          {activeTab === 'users'    && <AddUserTab onSuccess={fetchAll} />}
+          {activeTab === 'flats'    && <AddFlatTab onSuccess={fetchAll} />}
+          {activeTab === 'link'     && <LinkTab users={users} flats={flats} onSuccess={fetchAll} />}
+          {activeTab === 'geofence' && <GeofenceTab />}
+          {activeTab === 'list'     && <UsersListTab users={users} loading={loading} onDelete={handleDeleteUser} />}
+        </main>
+      </div>
     </div>
   )
 }
